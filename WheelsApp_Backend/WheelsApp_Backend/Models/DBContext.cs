@@ -1,20 +1,11 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Linq;
-using System.Web;
+﻿using Microsoft.EntityFrameworkCore;
+using WheelsApp_Backend.Models;
 
 namespace WheelsApp_Backend.Models
 {
-    public class DBContext :IdentityDbContext<IdentityUser>
-    {
-        public DBContext(DbContextOptions<DBContext>options):base(options) {
+    public class WheelsContext : DbContext {
+        public WheelsContext(DbContextOptions<WheelsContext> options) : base(options) {}
 
-        }
-        public DbSet<Client> clients { get; set; }
-        public DbSet<Car> cars { get; set; }
+        public DbSet<User> Users { get; set; }
     }
 }

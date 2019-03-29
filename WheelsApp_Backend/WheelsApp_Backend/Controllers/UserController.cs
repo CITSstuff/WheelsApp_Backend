@@ -1,93 +1,73 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
 using WheelsApp_Backend.Models;
-
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace WheelsApp_Backend.Controllers
 {
-    [Route("User")]
+    [Route("api/controller")]
     [ApiController]
-    public class UserController : Controller
-    {
-        private readonly DBContext _db;
-        private readonly UserManager<IdentityUser> _userManager;
-        private readonly RoleManager<IdentityRole> _roleManager;
-        public UserController(DBContext db, UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager)
-        {
-            _db = db;
-            _userManager = userManager;
-            _roleManager = roleManager;
+    public class UserController : Controller {
+        private readonly WheelsContext _context;
 
+        public UserController(WheelsContext context) {
+            _context = context;
+
+            if (_context.Users.Count() == 0) {
+                // Create a new User if collection is empty,
+                // which means you can't delete all Users.
+                _context.Users.Add(new User {
+                    token = 2,
+                    id_number = 1253535353536,
+                    telephone = "024 158 2200",
+                    first_name = "Olwethu",
+                    lasst_name = "Makhuz",
+                    role = "client",
+                    telephone_2 = "014 112 4525",
+                    work_contact = "011 424 7588",
+                    next_of_keen = "Details of next of keen",
+
+                  });
+                _context.SaveChanges();
+            }
         }
 
-
-
-        [Route("login/{userame}/{password}")]
-        [HttpPost]
-        public async Task<String> Login(string username, string password)
+        // GET: api/User get all users
+        [HttpGet]
+        [Route("/getAllUsers")]
+        public async Task<ActionResult<IEnumerable<User>>> GetUsers()
         {
-            return await LoginUser(username, password);
-        }
-        [Route("register/{username}/{userrole}/{password}")]
-        [HttpPost]
-        public async Task<String> Register(string username, string userrole, string password)
-        {
-            return await CreateUser(username, userrole, password);
+            return await _context.Users.ToListAsync();
         }
 
-        private async Task<String> LoginUser(string name, string password)
-        {
-            var user = new IdentityUser();
-            user.UserName = name;
+        // GET: api/User/5
+        [HttpGet("{id_number}")]
+        public ActionResult GetUserWithId(long id_number) { 
+            var User = _context.Users.Where(u => u.id_number == id_number).First();
 
-            var u = await _userManager.FindByNameAsync(name);
-            var isValid = await _userManager.CheckPasswordAsync(u, password);
-            var isLocked = await _userManager.GetLockoutEnabledAsync(u);
-            if (isValid && !isLocked) return u.PasswordHash;
-
-            return null;
-
-        }
-        private async Task<String> CreateUser(string name, string userrole, string password)
-        {
-
-            if (!await _roleManager.RoleExistsAsync(userrole))
-            {
-                var roleResult = await _roleManager.CreateAsync(new IdentityRole(userrole));
+            if (User == null) {
+                return NotFound();
             }
 
-            var user = new IdentityUser();
-
-            user.UserName = name;
-
-            var adminresult = await _userManager.CreateAsync(user, password);
-
-            if (adminresult.Succeeded)
-            {
-                var result = await _userManager.AddToRoleAsync(user, userrole);
-
-                if (result.Succeeded)
-                {
-                    await _userManager.SetLockoutEnabledAsync(user, true);
-
-                    return user.PasswordHash;
-                }
-
-            }
-            else if (adminresult.Errors.Any(u => u.Description == $"Name{name} is already taken."))
-            {
-                var u = await _userManager.FindByNameAsync(name);
-                var isValid = await _userManager.CheckPasswordAsync(u, password);
-                if (isValid) return u.PasswordHash;
-
-            }
-            throw new Exception(adminresult.Errors.FirstOrDefault() == null ? "Unknown error" : adminresult.Errors.FirstOrDefault().Description);
-
+            return Ok(User);        
         }
+
+        // GET: api/User/5
+        //[HttpGet("{role}")]
+        //[Route("/getUserByRole")]
+        //public async Task<ActionResult<User>> GetUserWithRole(string role)
+        //{
+        //    var User = await _context.Users.FindAsync(role);
+
+        //    if (User == null)
+        //    {
+        //        return NotFound();
+        //    }
+
+        //    return User;
+        //}
+
     }
 }

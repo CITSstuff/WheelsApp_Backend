@@ -1,21 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿// Unused usings removed
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Swashbuckle.AspNetCore.Swagger;
 using WheelsApp_Backend.Models;
 
-namespace WheelsApp_Backend
+namespace WheelsApi
 {
     public class Startup
     {
@@ -26,16 +20,22 @@ namespace WheelsApp_Backend
 
         public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
+        // This method gets called by the runtime. Use this method to add services to the 
+        //container.
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
-            services.AddDbContext<DBContext>(options => options.UseSqlServer(Configuration.GetConnectionString("WheelsContextDB")));
-            services.AddIdentity<IdentityUser, IdentityRole>();
+            services.AddDbContext<WheelsContext>(options => options.UseSqlServer(Configuration.GetConnectionString("WheelsDB")));
+            services.AddIdentity<IdentityUser, IdentityRole>()
+                .AddEntityFrameworkStores<WheelsContext>()
+                .AddDefaultTokenProviders();
+          
+
             // Register the Swagger generator, defining 1 or more Swagger documents
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new Info { Title = "Wheels API", Version = "v1" });
+
             });
         }
 
