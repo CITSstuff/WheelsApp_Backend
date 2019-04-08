@@ -20,29 +20,35 @@ namespace WheelsApp_Backend.Migrations
 
             modelBuilder.Entity("WheelsApp_Backend.Models.User", b =>
                 {
-                    b.Property<long>("Id")
+                    b.Property<long>("User_Id")
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("first_name");
+                    b.Property<string>("Account_status");
 
-                    b.Property<long>("id_number");
+                    b.Property<string>("Date_created");
 
-                    b.Property<string>("lasst_name");
+                    b.Property<string>("Email");
 
-                    b.Property<string>("next_of_keen");
+                    b.Property<string>("First_name");
 
-                    b.Property<string>("role");
+                    b.Property<long>("Id_number");
 
-                    b.Property<string>("telephone");
+                    b.Property<string>("Last_name");
 
-                    b.Property<string>("telephone_2");
+                    b.Property<string>("Password");
 
-                    b.Property<int>("token");
+                    b.Property<int?>("Role");
 
-                    b.Property<string>("work_contact");
+                    b.Property<string>("Sex");
 
-                    b.HasKey("Id");
+                    b.Property<string>("Telephone");
+
+                    b.Property<string>("Telephone_2");
+
+                    b.Property<string>("Username");
+
+                    b.HasKey("User_Id");
 
                     b.ToTable("Users");
                 });
