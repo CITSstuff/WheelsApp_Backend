@@ -8,8 +8,8 @@ using System.Threading.Tasks;
 namespace WheelsApp_Backend.Models
 {
 
-    public enum Role { 
-        Admin, Client
+    public enum Role {
+        Client, Admin
     }
 
     public class User {
@@ -29,14 +29,23 @@ namespace WheelsApp_Backend.Models
         public string Account_status { get; set; } = "active";
         public Role? Role { get; set; }
     }
+    public class Credentials
+    {
+        public string Username { set; get; }
+        public string Password { set; get; }
+    }
+
+    public class Passwords
+    {
+        public string Password { set; get; }
+        public string New_Password { set; get; }
+    }
 
     public class UserViewModel
     {
         public long User_ID { get; set; }
         public string First_Name { get; set; }
         public string Last_Name { get; set; }
-        public string First_name { get; set; }
-        public string Last_name { get; set; }
         public string Username { get; set; }
         public string Email { get; set; }
         public long Id_number { get; set; }

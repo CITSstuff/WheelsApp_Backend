@@ -1,9 +1,13 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using WheelsApi.Helper;
 using WheelsApp_Backend.Data;
@@ -14,8 +18,10 @@ namespace WheelsApp_Backend.Controllers {
     [ApiController]
     public class UserController : Controller {
         private IDataRepository<User> _iRepoUser;
-        public UserController(WheelsContext context) {
+        private IConfiguration _configuration;
+        public UserController(WheelsContext context, IConfiguration configuration) {
             _iRepoUser = new DataRepository<User>();
+            _configuration = configuration;
         }
 
         /* <summary>
@@ -107,8 +113,8 @@ namespace WheelsApp_Backend.Controllers {
 
                             var user = new Client {
                                
-                                First_name = userViewModel.First_name,
-                                Last_name = userViewModel.Last_name,
+                                First_name = userViewModel.First_Name,
+                                Last_name = userViewModel.Last_Name,
                                 Email = userViewModel.Email,
                                 Password = secure,
                                 Id_number = userViewModel.Id_number,
@@ -132,8 +138,8 @@ namespace WheelsApp_Backend.Controllers {
                             if (userViewModel.Role == Role.Admin) {
                                 var user = new User {
                                     
-                                    First_name = userViewModel.First_name,
-                                    Last_name = userViewModel.Last_name,
+                                    First_name = userViewModel.First_Name,
+                                    Last_name = userViewModel.Last_Name,
                                     Email = userViewModel.Email,
                                     Password = secure,
                                     Id_number = userViewModel.Id_number,
@@ -176,6 +182,96 @@ namespace WheelsApp_Backend.Controllers {
                     Discription = e.Message
                 });
             }
+
+        }
+
+        //This action @ AuthenticateApp([FromForm]Credentials credentials bind form data 
+        /// <summary>
+        /// Registers the user for the web app
+        /// </summary>
+        /// <param name="credentials"></param>   
+        [AllowAnonymous]
+        [HttpPost]
+        [Route("/authenticate")]
+        public IActionResult Authenticate(Credentials credentials)
+        {
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    var secure = Helper.Hash(credentials.Password.ToString());
+                    var isAuth = _iRepoUser.GetAll().Where(u => (u.Id_number.ToString() == credentials.Username && u.Password == secure ) || (u.Email == credentials.Username && u.Password == secure ) || (u.Username == credentials.Username  && u.Password == secure)).FirstOrDefault();
+
+                    if (isAuth != null && isAuth.Account_status == "Active")
+                    {
+                        var signingkey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["SigninKey"]));
+                        var token = Helper.Token(
+                            _configuration["Issuer"],
+                            _configuration["Audience"],
+                            signingkey,
+                            isAuth.Email,
+                            isAuth.User_Id.ToString(),
+                            isAuth.Role.Value);
+                        var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
+
+                        return Ok(new
+                        {
+
+                            error = "false",
+                            message = "Success",
+                            isAuth.Username,
+                            isAuth.Email,
+                            User = isAuth.Email,
+                            isAuth.Id_number,
+                            isAuth.Sex,
+                            isAuth.Telephone,
+                            isAuth.Telephone_2,
+                            isAuth.Account_status,
+                            isAuth.Date_created,
+                            FirstName = isAuth.First_name,
+                            LastName = isAuth.Last_name,
+                            isAuth.Role,
+                            timeStamp_Date = DateTime.Now.ToShortDateString().Replace('/', '-'),
+                            timeStamp_Time = DateTime.Now.ToShortTimeString(),
+                            Token = tokenString,
+                        });
+                    }
+                    else if (isAuth != null && isAuth.Account_status != "Active")
+                    {
+                        return BadRequest(new
+                        {
+                            error = "true",
+                            message = "Sorry your account has been deactivated. Please contact admin"
+                        });
+                    } else {
+
+                        return BadRequest(new
+                        {
+                            error = "true",
+                            message = "Sorry, looks like your username or password is incorrect "
+                        });
+                    }
+                }
+                else
+                {
+                    return Json(new
+                    {
+                        error = "true",
+                        message = "Invalid model"
+
+                    });
+                }
+            }
+            catch (Exception e)
+            {
+                return BadRequest(new
+                {
+                    error = "true",
+                    message = "Incorrect username or password",
+                    description = e.Message
+                });
+            }
+
 
         }
     }
