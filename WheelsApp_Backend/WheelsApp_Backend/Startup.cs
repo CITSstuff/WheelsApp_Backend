@@ -80,6 +80,7 @@ namespace WheelsApi
             });
 
             app.UseHttpsRedirection();
+            Imbewu.theSeed();
             app.UseMvc();
         }
     }

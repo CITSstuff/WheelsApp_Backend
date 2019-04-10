@@ -24,9 +24,9 @@ namespace WheelsApp_Backend.Models
         public string Telephone { get; set; }
         public long   Id_number { get; set; }
         public string Telephone_2 { get; set; }
-        public string Sex { get; set; }
+        public string Sex { get; set; } = "Male";
         public string Date_created { get; set; }
-        public string Account_status { get; set; } = "active";
+        public string Account_status { get; set; } = "Active";
         public Role? Role { get; set; }
     }
     public class Credentials
@@ -50,6 +50,7 @@ namespace WheelsApp_Backend.Models
         public string Email { get; set; }
         public long Id_number { get; set; }
         public string Password { get; set; }
+        public string Sex { get; set; }
         public string Avatar { get; set; }
         public string Account_Status { get; set; }
         public Role? Role { get; set; }
@@ -59,9 +60,6 @@ namespace WheelsApp_Backend.Models
     }
 
     public class Client : User {
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public long Client_id { get; set; }
         public Int32 Token { get; set; }
         public string Avatar { get; set; }
         public string Work_telephone { get; set; }
