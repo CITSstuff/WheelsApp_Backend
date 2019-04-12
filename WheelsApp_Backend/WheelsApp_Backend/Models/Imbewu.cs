@@ -18,8 +18,8 @@ namespace WheelsApp_Backend.Models {
             /** Seed admin on the system**/
             var users = new User[] {
                 new User {
-                    First_name ="Admin",
-                    Last_name = "Admin",
+                    First_Name ="Admin",
+                    Last_Name = "Admin",
                     Email ="wheels.ease@gmail.com",
                     Telephone = "0",
                     Password = Helper.Hash("Admin"),
