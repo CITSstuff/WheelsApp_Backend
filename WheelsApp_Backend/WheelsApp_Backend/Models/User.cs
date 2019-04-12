@@ -16,8 +16,8 @@ namespace WheelsApp_Backend.Models
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long   User_Id { get; set; }
-        public string First_name { get; set; }
-        public string Last_name { get; set; }
+        public string First_Name { get; set; }
+        public string Last_Name { get; set; }
         public string Username { get; set; }
         public string Email { get; set; }
         public string Password { get; set; }
@@ -43,6 +43,8 @@ namespace WheelsApp_Backend.Models
 
     public class UserViewModel
     {
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long User_ID { get; set; }
         public string First_Name { get; set; }
         public string Last_Name { get; set; }
@@ -57,31 +59,39 @@ namespace WheelsApp_Backend.Models
         public string Telephone { get; set; }
         public string Telephone_2 { get; set; }
         public string Work_telephone { get; set; }
+
+        public List<Address> Addresses { get; set; }
+        public List<NextOfKin> OfKins { get; set; }
     }
 
     public class Client : User {
         public Int32 Token { get; set; }
         public string Avatar { get; set; }
         public string Work_telephone { get; set; }
-        public NextOfKin Next_of_kin { get; set; }
-        public Address Address { get; set; }
+        public List<Address> Addresses { get; set; }
+        public List<NextOfKin> OfKins { get; set; }
 
     }
 
-    public class NextOfKin {
+    public class NextOfKin
+    {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public long Kin_id { get; set; }
+        public long OfKin_ID { get; set; }
         public string Telephone { get; set; }
         public string Work_telephone { get; set; }
         public Address Address { get; set; }
 
     }
+    /* The relationship from 'Address.UserForeignKey' to 'User' with foreign key properties {'Building_name' : string}
+    cannot target the primary key {'User_Id' : long}
+    because it is not compatible.Configure a principal key or a set of compatible foreign key properties for this relationship.*/
 
-    public class Address {
+    public class Address
+    {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public long Address_Id { get; set; }
+        public long Address_Id {get; set; }
         public string Building_name { get; set; }
         public string Street { get; set; }
         public string City { get; set; }

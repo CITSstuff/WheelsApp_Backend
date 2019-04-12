@@ -29,6 +29,8 @@ namespace WheelsApp_Backend.Migrations
 
                     b.Property<string>("City");
 
+                    b.Property<long?>("ClientUser_Id");
+
                     b.Property<string>("Country");
 
                     b.Property<string>("Postal_code");
@@ -37,26 +39,32 @@ namespace WheelsApp_Backend.Migrations
 
                     b.HasKey("Address_Id");
 
+                    b.HasIndex("ClientUser_Id");
+
                     b.ToTable("Address");
                 });
 
             modelBuilder.Entity("WheelsApp_Backend.Models.NextOfKin", b =>
                 {
-                    b.Property<long>("Kin_id")
+                    b.Property<long>("OfKin_ID")
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<long?>("Address_Id");
 
+                    b.Property<long?>("ClientUser_Id");
+
                     b.Property<string>("Telephone");
 
                     b.Property<string>("Work_telephone");
 
-                    b.HasKey("Kin_id");
+                    b.HasKey("OfKin_ID");
 
                     b.HasIndex("Address_Id");
 
-                    b.ToTable("NextOfKin");
+                    b.HasIndex("ClientUser_Id");
+
+                    b.ToTable("NextOfs");
                 });
 
             modelBuilder.Entity("WheelsApp_Backend.Models.User", b =>
@@ -74,11 +82,11 @@ namespace WheelsApp_Backend.Migrations
 
                     b.Property<string>("Email");
 
-                    b.Property<string>("First_name");
+                    b.Property<string>("First_Name");
 
                     b.Property<long>("Id_number");
 
-                    b.Property<string>("Last_name");
+                    b.Property<string>("Last_Name");
 
                     b.Property<string>("Password");
 
@@ -103,21 +111,20 @@ namespace WheelsApp_Backend.Migrations
                 {
                     b.HasBaseType("WheelsApp_Backend.Models.User");
 
-                    b.Property<long?>("Address_Id");
-
                     b.Property<string>("Avatar");
-
-                    b.Property<long?>("Next_of_kinKin_id");
 
                     b.Property<int>("Token");
 
                     b.Property<string>("Work_telephone");
 
-                    b.HasIndex("Address_Id");
-
-                    b.HasIndex("Next_of_kinKin_id");
-
                     b.HasDiscriminator().HasValue("Client");
+                });
+
+            modelBuilder.Entity("WheelsApp_Backend.Models.Address", b =>
+                {
+                    b.HasOne("WheelsApp_Backend.Models.Client")
+                        .WithMany("Addresses")
+                        .HasForeignKey("ClientUser_Id");
                 });
 
             modelBuilder.Entity("WheelsApp_Backend.Models.NextOfKin", b =>
@@ -125,17 +132,10 @@ namespace WheelsApp_Backend.Migrations
                     b.HasOne("WheelsApp_Backend.Models.Address", "Address")
                         .WithMany()
                         .HasForeignKey("Address_Id");
-                });
 
-            modelBuilder.Entity("WheelsApp_Backend.Models.Client", b =>
-                {
-                    b.HasOne("WheelsApp_Backend.Models.Address", "Address")
-                        .WithMany()
-                        .HasForeignKey("Address_Id");
-
-                    b.HasOne("WheelsApp_Backend.Models.NextOfKin", "Next_of_kin")
-                        .WithMany()
-                        .HasForeignKey("Next_of_kinKin_id");
+                    b.HasOne("WheelsApp_Backend.Models.Client")
+                        .WithMany("OfKins")
+                        .HasForeignKey("ClientUser_Id");
                 });
 #pragma warning restore 612, 618
         }

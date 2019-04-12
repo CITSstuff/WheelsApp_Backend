@@ -5,7 +5,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -13,13 +12,14 @@ using Microsoft.IdentityModel.Tokens;
 using WheelsApi.Helper;
 using WheelsApp_Backend.Models;
 
-namespace WheelsApp_Backend.Controllers {
+namespace WheelsApp_Backend.Controllers
+{
     [Route("api/users")]
     [ApiController]
     public class UsersController : ControllerBase
     {
         private readonly WheelsContext wheelsContext;
-        private IConfiguration _configuration;
+        private IConfiguration _configuration; 
 
         public UsersController(WheelsContext wContext, IConfiguration configuration) {
             wheelsContext = wContext;
@@ -34,18 +34,17 @@ namespace WheelsApp_Backend.Controllers {
         [AllowAnonymous]
         [HttpPost]
         [Route("/register")]
-        public async Task<ActionResult<User>> CreateUser(UserViewModel userViewModel)
+        public async Task<Object> CreateUser(Client userViewModel)
         {
             try
             {
                 if (ModelState.IsValid)
                 {
 
-                    var existingUser = wheelsContext.Users.Where(u => u.Id_number == userViewModel.Id_number).FirstOrDefault();
-                    var existingUserByEmail = wheelsContext.Users.Where(u => u.Email == userViewModel.Email).FirstOrDefault();
-                    var existingUserByUsername = wheelsContext.Users.Where(u => u.Username == userViewModel.Username).FirstOrDefault();
+                    var doesExists = wheelsContext.Users.Any(u => u.Id_number == userViewModel.Id_number || u.Email == userViewModel.Email || u.Username == userViewModel.Username);
 
-                    if (existingUser == null && existingUserByEmail == null && existingUserByUsername == null) {
+                    if (!doesExists) {
+
                         /* var existingEmail = _context.Users.Where(u => u.Email == userViewModel.Email).FirstOrDefault();
                          * var existingUsername = _context.Users.Where(u => u.Username == userViewModel.Username).FirstOrDefault();
                         if (existingUser ==  null) {
@@ -78,10 +77,11 @@ namespace WheelsApp_Backend.Controllers {
                             secure = Helper.Hash(userViewModel.Password.ToString());
                             var contact = 0;
 
+                           var lastId = wheelsContext.Users.Max(u => u.User_Id);
                             var user = new Client {
 
-                                First_name = userViewModel.First_Name,
-                                Last_name = userViewModel.Last_Name,
+                                First_Name = userViewModel.First_Name,
+                                Last_Name = userViewModel.Last_Name,
                                 Email = userViewModel.Email,
                                 Password = secure,
                                 Id_number = userViewModel.Id_number,
@@ -90,18 +90,33 @@ namespace WheelsApp_Backend.Controllers {
                                 Telephone_2 = userViewModel.Telephone_2 ?? contact.ToString(),
                                 Work_telephone = userViewModel.Work_telephone ?? contact.ToString(),
                                 Role = Role.Client,
-                                Date_created = DateTime.Now.ToShortDateString().Replace('/', '-')
+                                Date_created = DateTime.Now.ToShortDateString().Replace('/', '-'),
+
+                                /* Addresses = new List<Address>
+                               {
+                                   new Address
+                                   {
+                                       ClientUser_Id = lastId
+                                   }
+                               }, */
+                                Addresses = userViewModel.Addresses,
+                                OfKins = userViewModel.OfKins
                             };
+                            wheelsContext.Users.AddRange(user);
+                            wheelsContext.SaveChanges();
 
-                            wheelsContext.Users.Add(user);
-
-                            await wheelsContext.SaveChangesAsync();
+                            /*
+                             * db.Products.Add(product);
+                             * db.SaveChanges();
+                             * int lastProductId = db.Products.Max(item => item.ProductId);
+                             */
                             return CreatedAtAction(nameof(GetUserByID), new
                             {
                                 id = user.User_Id,
                                 error = "false",
                                 message = "registration was successful"
                             }, user);
+
                         } else if(userViewModel.Role == Role.Admin) {
                             
                                 generatedPassword = Helper.CreatePassword(8);
@@ -109,8 +124,8 @@ namespace WheelsApp_Backend.Controllers {
                                 var user = new User
                                 {
 
-                                    First_name = userViewModel.First_Name,
-                                    Last_name = userViewModel.Last_Name,
+                                    First_Name = userViewModel.First_Name,
+                                    Last_Name = userViewModel.Last_Name,
                                     Email = userViewModel.Email,
                                     Password = secure,
                                     Id_number = userViewModel.Id_number,
@@ -125,20 +140,23 @@ namespace WheelsApp_Backend.Controllers {
                                 wheelsContext.Users.Add(user);
 
                                 await wheelsContext.SaveChangesAsync();
-                                return CreatedAtAction(nameof(GetUserByID), new
-                                {
-                                    id = user.User_Id,
-                                    error = "false",
-                                    message = "registration was successful"
-                                }, user);
-                            } else { return BadRequest(new {
+                            return CreatedAtAction(nameof(GetUserByID), new
+                            {
+                                id = user.User_Id,
+                                error = "false",
+                                message = "registration was successful"
+                            }, user);
+                        } else {
+                            return BadRequest(new
+                            {
                                 error = "true",
                                 message = "sorry, you have no role here!"
                             });
-                            }
+                        }
 
                     } else {
-                        return BadRequest(new {
+                        return BadRequest(new
+                        {
                             error = "true",
                             message = "sorry, user already exits"
                         });
@@ -165,12 +183,11 @@ namespace WheelsApp_Backend.Controllers {
             }
 
         }
-
-
+        
         /* <summary>
                 Athenticate user and grant access to 
            </summary>  */
-        /** <param name="credentials"></param> **/
+                            /** <param name="credentials"></param> **/
         [AllowAnonymous]
         [HttpPut]
         [Route("/authenticate")]
@@ -209,8 +226,8 @@ namespace WheelsApp_Backend.Controllers {
                             isAuth.Telephone_2,
                             isAuth.Account_status,
                             isAuth.Date_created,
-                            FirstName = isAuth.First_name,
-                            LastName = isAuth.Last_name,
+                            FirstName = isAuth.First_Name,
+                            LastName = isAuth.Last_Name,
                             isAuth.Role,
                             timeStamp_Date = DateTime.Now.ToShortDateString().Replace('/', '-'),
                             timeStamp_Time = DateTime.Now.ToShortTimeString(),
@@ -261,6 +278,7 @@ namespace WheelsApp_Backend.Controllers {
         /* <summary>
              -- Gets all users
            </summary> */
+
         [HttpGet]
         [Route("/getAllUsers")]
         public async Task<ActionResult<IEnumerable<User>>> GetAllUsers() {
@@ -296,25 +314,25 @@ namespace WheelsApp_Backend.Controllers {
            </summary> */
         [HttpPut]
         [Route("/updateUser")]
-        public async Task<IActionResult> UpdateUser(User user) {
+        public async Task<IActionResult> UpdateUser(UserViewModel user) {
 
 
             try
             {
-                if (UserExists(user.User_Id))
+                if (UserExists(user.User_ID))
                 {
-                    var existingData = wheelsContext.Users.FirstOrDefault(u => u.User_Id == user.User_Id);
-                    existingData.First_name = user.First_name ?? existingData.First_name;
-                    existingData.Last_name = user.Last_name ?? existingData.Last_name;
-                    existingData.Username = user.Username ?? existingData.Username;
-                    existingData.Email = user.Email ?? existingData.Email;
-                    existingData.Telephone = user.Telephone ?? existingData.Last_name;
-                    existingData.Telephone_2 = user.Telephone_2 ?? existingData.Telephone_2;
-                    existingData.Id_number = user.Id_number;
-                    existingData.Sex = user.Sex  ?? existingData.Sex;
-               
-                    wheelsContext.Entry(existingData).State = EntityState.Modified;
-                    await wheelsContext.SaveChangesAsync();
+                    var oldUser = wheelsContext.Users.FirstOrDefault(u => u.User_Id == user.User_ID);
+                    oldUser.First_Name = user.First_Name ?? oldUser.First_Name;
+                    oldUser.Last_Name = user.Last_Name ?? oldUser.Last_Name;
+                    oldUser.Username = user.Username ?? oldUser.Username;
+                    oldUser.Email = user.Email ?? oldUser.Email;
+                    oldUser.Telephone = user.Telephone ?? oldUser.Last_Name;
+                    oldUser.Telephone_2 = user.Telephone_2 ?? oldUser.Telephone_2;
+                    oldUser.Id_number = user.Id_number;
+                    oldUser.Sex = user.Sex ?? oldUser.Sex;
+                    
+                    wheelsContext.Entry(oldUser).State = EntityState.Modified;
+                    await wheelsContext.SaveChangesAsync(); 
 
                     return Ok(new {
                         error = "false",
