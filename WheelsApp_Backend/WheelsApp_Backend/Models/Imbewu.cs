@@ -30,7 +30,7 @@ namespace WheelsApp_Backend.Models {
                 Id_number = 00000000000013,
                 Date_created = DateTime.Now.AddDays(30).ToShortDateString(),
             
-            /* Addresses = new List<Address>   {
+            Addresses = new List<Address>   {
                 new Address {
             Building_name = "Bavitana",
             Street =  "8 Aureolle",
@@ -43,16 +43,16 @@ namespace WheelsApp_Backend.Models {
               Telephone = "078 231 1234",
               Work_telephone = "011 092 3243",
 
-                Address = new Address {
+                /*Address = new Address {
                 Building_name = "Mariston",
                 Street = "30 Claim street",
                 City = "JHB",
                 Country = "ZAR",
                 Postal_code = "2001"
                     }
+            */
                 }
-            }*/
-
+            }
             };
             wheelsCtx.Users.AddRange(user);
             wheelsCtx.SaveChanges();

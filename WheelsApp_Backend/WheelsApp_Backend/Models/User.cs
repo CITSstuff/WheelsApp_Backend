@@ -80,7 +80,6 @@ namespace WheelsApp_Backend.Models
         public long OfKin_ID { get; set; }
         public string Telephone { get; set; }
         public string Work_telephone { get; set; }
-        public Address Address { get; set; }
 
     }
     /* The relationship from 'Address.UserForeignKey' to 'User' with foreign key properties {'Building_name' : string}
