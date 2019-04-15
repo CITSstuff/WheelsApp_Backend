@@ -67,18 +67,11 @@ namespace WheelsApp_Backend.Migrations
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     Telephone = table.Column<string>(nullable: true),
                     Work_telephone = table.Column<string>(nullable: true),
-                    Address_Id = table.Column<long>(nullable: true),
                     ClientUser_Id = table.Column<long>(nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_NextOfs", x => x.OfKin_ID);
-                    table.ForeignKey(
-                        name: "FK_NextOfs_Address_Address_Id",
-                        column: x => x.Address_Id,
-                        principalTable: "Address",
-                        principalColumn: "Address_Id",
-                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_NextOfs_Users_ClientUser_Id",
                         column: x => x.ClientUser_Id,
@@ -93,11 +86,6 @@ namespace WheelsApp_Backend.Migrations
                 column: "ClientUser_Id");
 
             migrationBuilder.CreateIndex(
-                name: "IX_NextOfs_Address_Id",
-                table: "NextOfs",
-                column: "Address_Id");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_NextOfs_ClientUser_Id",
                 table: "NextOfs",
                 column: "ClientUser_Id");
@@ -106,10 +94,10 @@ namespace WheelsApp_Backend.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "NextOfs");
+                name: "Address");
 
             migrationBuilder.DropTable(
-                name: "Address");
+                name: "NextOfs");
 
             migrationBuilder.DropTable(
                 name: "Users");

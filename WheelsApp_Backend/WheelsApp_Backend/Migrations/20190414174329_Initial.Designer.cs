@@ -10,7 +10,7 @@ using WheelsApp_Backend.Models;
 namespace WheelsApp_Backend.Migrations
 {
     [DbContext(typeof(WheelsContext))]
-    [Migration("20190412085322_Initial")]
+    [Migration("20190414174329_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -52,8 +52,6 @@ namespace WheelsApp_Backend.Migrations
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<long?>("Address_Id");
-
                     b.Property<long?>("ClientUser_Id");
 
                     b.Property<string>("Telephone");
@@ -61,8 +59,6 @@ namespace WheelsApp_Backend.Migrations
                     b.Property<string>("Work_telephone");
 
                     b.HasKey("OfKin_ID");
-
-                    b.HasIndex("Address_Id");
 
                     b.HasIndex("ClientUser_Id");
 
@@ -131,10 +127,6 @@ namespace WheelsApp_Backend.Migrations
 
             modelBuilder.Entity("WheelsApp_Backend.Models.NextOfKin", b =>
                 {
-                    b.HasOne("WheelsApp_Backend.Models.Address", "Address")
-                        .WithMany()
-                        .HasForeignKey("Address_Id");
-
                     b.HasOne("WheelsApp_Backend.Models.Client")
                         .WithMany("OfKins")
                         .HasForeignKey("ClientUser_Id");
