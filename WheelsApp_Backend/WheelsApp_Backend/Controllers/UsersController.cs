@@ -34,7 +34,7 @@ namespace WheelsApp_Backend.Controllers
         [AllowAnonymous]
         [HttpPost]
         [Route("/register")]
-        public async Task<Object> CreateUser(Client userViewModel)
+        public async Task<Object> CreateUser(UserViewModel userViewModel)
         {
             try
             {
@@ -314,14 +314,14 @@ namespace WheelsApp_Backend.Controllers
            </summary> */
         [HttpPut]
         [Route("/updateUser")]
-        public async Task<IActionResult> UpdateUser(UserViewModel user) {
+        public async Task<IActionResult> UpdateUser(Client user) {
 
 
             try
             {
-                if (UserExists(user.User_ID))
+                if (Helper.UserExists(user.User_Id, wheelsContext))
                 {
-                    var oldUser = wheelsContext.Users.FirstOrDefault(u => u.User_Id == user.User_ID);
+                    var oldUser = wheelsContext.Users.FirstOrDefault(u => u.User_Id == user.User_Id);
                     oldUser.First_Name = user.First_Name ?? oldUser.First_Name;
                     oldUser.Last_Name = user.Last_Name ?? oldUser.Last_Name;
                     oldUser.Username = user.Username ?? oldUser.Username;
@@ -330,7 +330,7 @@ namespace WheelsApp_Backend.Controllers
                     oldUser.Telephone_2 = user.Telephone_2 ?? oldUser.Telephone_2;
                     oldUser.Id_number = user.Id_number;
                     oldUser.Sex = user.Sex ?? oldUser.Sex;
-                    
+
                     wheelsContext.Entry(oldUser).State = EntityState.Modified;
                     await wheelsContext.SaveChangesAsync(); 
 
@@ -373,8 +373,5 @@ namespace WheelsApp_Backend.Controllers
             return user;
         }
 
-        private bool UserExists(long id) {
-            return wheelsContext.Users.Any(e => e.User_Id == id);
-        }
     }
 }
