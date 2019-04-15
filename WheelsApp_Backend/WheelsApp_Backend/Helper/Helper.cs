@@ -17,6 +17,25 @@ namespace WheelsApi.Helper
             return string.Join("", (new SHA1Managed().ComputeHash(Encoding.UTF8.GetBytes(input))).Select(x => x.ToString("X2")).ToArray());
         }
 
+        public static bool UserExists(long id, WheelsContext ctx)
+        {
+            return ctx.Users.Any(e => e.User_Id == id);
+        }
+
+        public static bool AddressExists(long id, WheelsContext ctx)
+        {
+            return ctx.Address.Any(e => e.Address_Id == id);
+        }
+
+        public static User GetUser(long userID, WheelsContext context) {
+
+            return context.Users.FirstOrDefault(u => u.User_Id == userID);
+        }
+
+        public static Address GetAddress(long addID, WheelsContext context) {
+
+            return context.Address.FirstOrDefault(entry => entry.Address_Id == addID);
+        }
 
         public static bool IsTaken(string takenInput) {
             return (takenInput == null) ? false : true;

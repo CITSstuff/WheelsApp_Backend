@@ -8,73 +8,89 @@ using System.Threading.Tasks;
 namespace WheelsApp_Backend.Models
 {
 
-    public enum Role { 
-        Admin, Client
+    public enum Role {
+        Client, Admin
     }
 
     public class User {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long   User_Id { get; set; }
-        public string First_name { get; set; }
-        public string Last_name { get; set; }
+        public string First_Name { get; set; }
+        public string Last_Name { get; set; }
         public string Username { get; set; }
         public string Email { get; set; }
         public string Password { get; set; }
         public string Telephone { get; set; }
         public long   Id_number { get; set; }
         public string Telephone_2 { get; set; }
-        public string Sex { get; set; }
+        public string Sex { get; set; } = "Male";
         public string Date_created { get; set; }
-        public string Account_status { get; set; } = "active";
+        public string Account_status { get; set; } = "Active";
         public Role? Role { get; set; }
+    }
+    public class Credentials
+    {
+        public string Username { set; get; }
+        public string Password { set; get; }
+    }
+
+    public class Passwords
+    {
+        public string Password { set; get; }
+        public string New_Password { set; get; }
     }
 
     public class UserViewModel
     {
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long User_ID { get; set; }
         public string First_Name { get; set; }
         public string Last_Name { get; set; }
-        public string First_name { get; set; }
-        public string Last_name { get; set; }
         public string Username { get; set; }
         public string Email { get; set; }
         public long Id_number { get; set; }
         public string Password { get; set; }
+        public string Sex { get; set; }
         public string Avatar { get; set; }
         public string Account_Status { get; set; }
         public Role? Role { get; set; }
         public string Telephone { get; set; }
         public string Telephone_2 { get; set; }
         public string Work_telephone { get; set; }
+
+        public List<Address> Addresses { get; set; }
+        public List<NextOfKin> OfKins { get; set; }
     }
 
     public class Client : User {
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public long Client_id { get; set; }
         public Int32 Token { get; set; }
         public string Avatar { get; set; }
         public string Work_telephone { get; set; }
-        public NextOfKin Next_of_kin { get; set; }
-        public Address Address { get; set; }
+        public List<Address> Addresses { get; set; }
+        public List<NextOfKin> OfKins { get; set; }
 
     }
 
-    public class NextOfKin {
+    public class NextOfKin
+    {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public long Kin_id { get; set; }
+        public long OfKin_ID { get; set; }
         public string Telephone { get; set; }
         public string Work_telephone { get; set; }
-        public Address Address { get; set; }
 
     }
+    /* The relationship from 'Address.UserForeignKey' to 'User' with foreign key properties {'Building_name' : string}
+    cannot target the primary key {'User_Id' : long}
+    because it is not compatible.Configure a principal key or a set of compatible foreign key properties for this relationship.*/
 
-    public class Address {
+    public class Address
+    {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public long Address_Id { get; set; }
+        public long Address_Id {get; set; }
         public string Building_name { get; set; }
         public string Street { get; set; }
         public string City { get; set; }
