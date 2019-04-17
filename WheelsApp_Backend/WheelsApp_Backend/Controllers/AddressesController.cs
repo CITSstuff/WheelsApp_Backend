@@ -9,7 +9,7 @@ using WheelsApp_Backend.Models;
 
 namespace WheelsApp_Backend.Controllers
 {
-    [Route("api/[clients]")]
+    [Route("api/[addresses]")]
     [ApiController]
     public class AddressesController : ControllerBase
     {
