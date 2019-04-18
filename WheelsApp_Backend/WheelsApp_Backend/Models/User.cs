@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace WheelsApp_Backend.Models
 {
@@ -26,7 +24,7 @@ namespace WheelsApp_Backend.Models
         public string Telephone_2 { get; set; }
         public string Sex { get; set; } = "Male";
         public string Date_created { get; set; }
-        public string Account_status { get; set; } = "Active";
+        public bool Account_status { get; set; } = true;
         public Role? Role { get; set; }
     }
     public class Credentials
@@ -37,6 +35,11 @@ namespace WheelsApp_Backend.Models
 
     public class Passwords
     {
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public string Contact { set; get; }
+        public string Reminder { set; get; } 
+        public string OfKinContact { set; get; }
         public string Password { set; get; }
         public string New_Password { set; get; }
     }
@@ -54,7 +57,7 @@ namespace WheelsApp_Backend.Models
         public string Password { get; set; }
         public string Sex { get; set; }
         public string Avatar { get; set; }
-        public string Account_Status { get; set; }
+        public bool Account_Status { get; set; }
         public Role? Role { get; set; }
         public string Telephone { get; set; }
         public string Telephone_2 { get; set; }
@@ -62,6 +65,12 @@ namespace WheelsApp_Backend.Models
 
         public List<Address> Addresses { get; set; }
         public List<NextOfKin> OfKins { get; set; }
+    }
+
+
+    public class QuickReserveClientViewModel : Client {
+        public string Reference { get; set; }
+        
     }
 
     public class Client : User {

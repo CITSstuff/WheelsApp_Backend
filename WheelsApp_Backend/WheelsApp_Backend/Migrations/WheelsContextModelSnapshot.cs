@@ -69,7 +69,7 @@ namespace WheelsApp_Backend.Migrations
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("Account_status");
+                    b.Property<bool>("Account_status");
 
                     b.Property<string>("Date_created");
 

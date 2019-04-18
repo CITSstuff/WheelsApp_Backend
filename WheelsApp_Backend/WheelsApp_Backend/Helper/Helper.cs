@@ -27,14 +27,19 @@ namespace WheelsApi.Helper
             return ctx.Address.Any(e => e.Address_Id == id);
         }
 
-        public static User GetUser(long userID, WheelsContext context) {
-
-            return context.Users.FirstOrDefault(u => u.User_Id == userID);
+        private static bool ClientExists(long id, WheelsContext ctx)
+        {
+            return ctx.Clients.Any(e => e.User_Id == id);
         }
 
-        public static Address GetAddress(long addID, WheelsContext context) {
+        public static User GetUser(long userID, Role role, WheelsContext ctx) {
 
-            return context.Address.FirstOrDefault(entry => entry.Address_Id == addID);
+            return ctx.Users.FirstOrDefault(u => u.User_Id == userID && u.Role == role);
+        }
+
+        public static Address GetAddress(long addID, WheelsContext ctx) {
+
+            return ctx.Address.FirstOrDefault(entry => entry.Address_Id == addID);
         }
 
         public static bool IsTaken(string takenInput) {

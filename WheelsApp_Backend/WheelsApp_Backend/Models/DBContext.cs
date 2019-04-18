@@ -25,5 +25,6 @@ namespace WheelsApp_Backend.Models
         public DbSet<Client> Clients { get; set; }
         public DbSet<Address> Address { get; set; }
         public DbSet<NextOfKin> NextOfs { get; set; }
+        public DbSet<Passwords> Passwords { get; set; }
     }
 }
