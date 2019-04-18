@@ -5,11 +5,12 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using WheelsApi.Helper;
 using WheelsApp_Backend.Models;
 
 namespace WheelsApp_Backend.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/[clients]")]
     [ApiController]
     public class ClientsController : ControllerBase
     {
@@ -20,86 +21,185 @@ namespace WheelsApp_Backend.Controllers
             _context = context;
         }
 
-        // GET: api/Clients
+        /*   <summary>
+           -- Get all Clients
+            </summary> */
+        /* <param name=" "></param>   */
         [HttpGet]
+        [Route("/getAllClients")]
         public async Task<ActionResult<IEnumerable<Client>>> GetClients()
         {
-            return await _context.Clients.ToListAsync();
+            var clients = await _context.Clients.Where(u => u.Account_status == true && u.Role == Role.Client).ToListAsync();
+            var list = new List<Client>();
+
+                foreach (var client in clients)
+                {
+                    var clientVM = new Client
+                    {
+                        User_Id = client.User_Id,
+                        First_Name = client.First_Name,
+                        Last_Name = client.Last_Name,
+                        Email = client.Email,
+                        Role = client.Role,
+                        Username = client.Username,
+                        Avatar = client.Avatar,
+                        Account_status = client.Account_status,
+                        Date_created = client.Date_created,
+                        Telephone =client.Telephone,
+                        Telephone_2 = client.Telephone_2,
+                        Sex = client.Sex,
+                        Id_number = client.Id_number,
+                        Work_telephone = client.Work_telephone,
+                        Password = "No password, LOL! :)",
+
+                        OfKins = client.OfKins,
+                        Addresses = client.Addresses
+                    };
+
+                    list.Add(clientVM);
+                }
+
+
+            return Ok(list);
         }
 
-        // GET: api/Clients/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Client>> GetClient(long id)
-        {
-            var client = await _context.Clients.FindAsync(id);
 
-            if (client == null)
+        /*   <summary>
+           -- Get Client by ID
+            </summary> */
+        /* <param name="ID", Client></param>   */
+        [HttpGet]
+        [Route("/getClientByID/{id}")]
+        public ActionResult<User> GetClientByID(long id)
+        {
+            if (Helper.UserExists(id, _context))
             {
+                try {
+
+                    var client = Helper.GetUser(id, Role.Client, _context);
+                    if (client == null) {
+                        return BadRequest(new
+                        {
+                            error = "true",
+                            message = "Ow Boi, this ID does not belong to any client"
+                        });
+                    } else {
+                        return client;
+                    }
+
+                } catch (Exception e) {
+                    return BadRequest(new
+                    {
+                        error = "true",
+                        message = "Sorry, I failed to get this Client",
+                        discription = e.Message
+                    });
+                }
+            } else {
                 return NotFound();
             }
-
-            return client;
         }
 
-        // PUT: api/Clients/5
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutClient(long id, Client client)
+        /*   <summary>
+           -- Update Client by ID
+            </summary> */
+        /* <param name="ID", Client></param>   
+        [HttpPut]
+        [Route("/updateClientByID/{id}")]
+        public async Task<IActionResult> updateClientByID(Client client)
         {
-            if (id != client.User_Id)
-            {
-                return BadRequest();
-            }
 
-            _context.Entry(client).State = EntityState.Modified;
+            if(!Helper.UserExists(client.User_Id, _context)) {
+                return NotFound();
+            }
 
             try
             {
+           
+                _context.Entry(client).State = EntityState.Modified;
+
                 await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!ClientExists(id))
+
+                return Ok(new
                 {
-                    return NotFound();
-                }
-                else
+                    error = "false",
+                    message = "Congratulations Big baby, you have gone wild!"
+                });
+                _context.Entry(client).State = EntityState.Modified;
+            } catch (DbUpdateConcurrencyException e) {
+                return BadRequest(new
                 {
-                    throw;
-                }
+                    error = "false",
+                    message = "Oops, looks like that didn't go so well. ..",
+                    discription = e.Message
+                });
             }
 
             return NoContent();
-        }
+        } */
 
-        // POST: api/Clients
+        /*   <summary>
+            -- Create Client by ID
+        </summary> */
+        /* <param name="ID", Client></param>   */
         [HttpPost]
-        public async Task<ActionResult<Client>> PostClient(Client client)
+        [Route("/createQuickClient")]
+        public async Task<ActionResult<Client>> CreateClient()
         {
+            var resId = _context.Users.Max(user => user.User_Id) +1;
+            var secure = Helper.Hash("quickClient");
+
+            var client = new Client {
+                First_Name = "Client",
+                Last_Name = "Reservation_" + resId,
+                Password = secure,
+                Id_number = resId,
+                Role = Role.Client,
+                Date_created = DateTime.Now.ToShortDateString().Replace('/', '-'),
+                Username = "WLZ RES_UNIT : " + resId,
+
+
+            };
             _context.Clients.Add(client);
             await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetClient", new { id = client.User_Id }, client);
+            QuickReserveClientViewModel quick = new QuickReserveClientViewModel {
+                User_Id = client.User_Id,
+                First_Name = client.First_Name,
+                Last_Name = client.Last_Name,
+                Id_number = client.Id_number,
+                Password = "",
+                Role = client.Role,
+                Date_created = client.Date_created,
+                Username = client.Username,
+                Reference = client.Username
+               
+            };
+            return CreatedAtAction("GetClientByID", new { id = client.User_Id}, quick);
         }
 
-        // DELETE: api/Clients/5
-        [HttpDelete("{id}")]
-        public async Task<ActionResult<Client>> DeleteClient(long id)
+        /*   <summary>
+                -- Create Client by ID
+             </summary> */
+        /* <param name="ID"></param>   */
+        [HttpPut]
+        [Route("/deactivateClientByID/{id}")]
+        public async Task<ActionResult<User>> DeleteClientByID(long id)
         {
-            var client = await _context.Clients.FindAsync(id);
-            if (client == null)
-            {
-                return NotFound();
-            }
+            /** Updating client through user**/
 
-            _context.Clients.Remove(client);
+            if (!Helper.UserExists(id, _context)) {
+                return NotFound(new
+                {
+                    error = "false",
+                    message = "Sorry, It doesn't look like I have this Client in my records!"
+                });
+            }
+            var existingClient = Helper.GetUser(id, Role.Client, _context);
+            existingClient.Account_status = false;
+            _context.Users.Update(existingClient);
             await _context.SaveChangesAsync();
 
-            return client;
-        }
-
-        private bool ClientExists(long id)
-        {
-            return _context.Clients.Any(e => e.User_Id == id);
+            return existingClient;
         }
     }
 }

@@ -120,6 +120,7 @@ namespace WheelsApp_Backend.Controllers
                         } else if(userViewModel.Role == Role.Admin) {
                             
                                 generatedPassword = Helper.CreatePassword(8);
+
                                 secure = Helper.Hash(generatedPassword);
                                 var user = new User
                                 {
@@ -200,7 +201,7 @@ namespace WheelsApp_Backend.Controllers
                     var secure = Helper.Hash(credentials.Password.ToString());
                     var isAuth = wheelsContext.Users.Where(u => (u.Id_number.ToString() == credentials.Username && u.Password == secure) || (u.Email == credentials.Username && u.Password == secure) || (u.Username == credentials.Username && u.Password == secure)).FirstOrDefault();
 
-                    if (isAuth != null && isAuth.Account_status == "Active")
+                    if (isAuth != null && isAuth.Account_status == true)
                     {
                         var signingkey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["SigninKey"]));
                         var token = Helper.Token(
@@ -234,7 +235,7 @@ namespace WheelsApp_Backend.Controllers
                             Token = tokenString,
                         });
                     }
-                    else if (isAuth != null && isAuth.Account_status != "Active")
+                    else if (isAuth != null && isAuth.Account_status == false)
                     {
                         return BadRequest(new
                         {
