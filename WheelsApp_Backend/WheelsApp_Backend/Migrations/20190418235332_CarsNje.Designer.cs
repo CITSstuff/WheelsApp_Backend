@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WheelsApp_Backend.Models;
 
 namespace WheelsApp_Backend.Migrations
 {
     [DbContext(typeof(WheelsContext))]
-    partial class WheelsContextModelSnapshot : ModelSnapshot
+    [Migration("20190418235332_CarsNje")]
+    partial class CarsNje
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -198,7 +200,7 @@ namespace WheelsApp_Backend.Migrations
             modelBuilder.Entity("WheelsApp_Backend.Models.Damages", b =>
                 {
                     b.HasOne("WheelsApp_Backend.Models.Car")
-                        .WithMany("Damages")
+                        .WithMany("Damages_Out")
                         .HasForeignKey("Car_Id");
                 });
 
