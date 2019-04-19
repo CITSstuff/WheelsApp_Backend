@@ -6,8 +6,8 @@ using WheelsApp_Backend.Models;
 namespace WheelsApp_Backend.Models
 {
     public class WheelsContext : DbContext {
-        public WheelsContext() {}
-        public WheelsContext(DbContextOptions<WheelsContext> options) : base(options) {}
+        public WheelsContext() { }
+        public WheelsContext(DbContextOptions<WheelsContext> options) : base(options) { }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)
@@ -21,6 +21,7 @@ namespace WheelsApp_Backend.Models
             }
         }
 
+        public DbSet<Car> Cars { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<Client> Clients { get; set; }
         public DbSet<Address> Address { get; set; }

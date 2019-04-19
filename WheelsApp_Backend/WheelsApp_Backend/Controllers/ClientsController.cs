@@ -178,7 +178,7 @@ namespace WheelsApp_Backend.Controllers
         }
 
         /*   <summary>
-                -- Create Client by ID
+                -- Deactivate Client by ID
              </summary> */
         /* <param name="ID"></param>   */
         [HttpPut]
